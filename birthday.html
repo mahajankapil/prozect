@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> - Product Page</title>
+
+  <!-- Bootstrap & Theme CSS -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <style>
+    body { background:#f5f7fa; }
+    .product-card { background:#fff; padding:32px; box-shadow:0 4px 20px rgba(0,0,0,0.08); }
+    .price-tag { color:#4285f4; font-size:28px; font-weight:700; }
+    .btn-buy { background:#4285f4; border:none; padding:14px 28px; font-size:18px; font-weight:600; transition:0.3s; }
+    .btn-buy:hover { background:#1a73e8; }
+
+    /* Remove rounded corners */
+    .product-card, 
+    .product-card img, 
+    .thumb-img {
+      border-radius: 0 !important;
+    }
+
+    /* Zoom effect on hover */
+    .zoom-container {
+      overflow: hidden;
+      position: relative;
+      display: inline-block;
+    }
+    .zoom-container img {
+      transition: transform 0.3s ease;
+      cursor: zoom-in;
+    }
+    .zoom-container:hover img {
+      transform: scale(1.2);
+    }
+
+    /* Thumbnails */
+    .thumb-img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .thumb-img:hover {
+      border-color: #4285f4;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header style="background:white;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+  <div style="font-size:24px;font-weight:700;font-family:Arial, sans-serif;">
+    <span style="color:hwb(217 12% 24%);">Project</span>
+    <span style="background:#316dcc;color:white;padding:2px 6px;">Wishlist</span>
+  </div>
+  <a href="index.html" style="text-decoration:none;color:#3965ac;font-weight:500;">← Back to Shop</a>
+</header>
+
+<!-- Product Section -->
+<main class="container py-5">
+  <div class="product-card row g-4">
+    <!-- Product Images -->
+    <div class="col-md-6 text-center">
+      <div class="zoom-container">
+        <img id="mainImage" 
+             src="https://iili.io/KWChtIa.jpg"
+             class="img-fluid shadow-sm" alt="">
+      </div>
+      <div class="d-flex justify-content-center gap-2 mt-3">
+        <img src="https://iili.io/KWChtIa.jpg" 
+             class="thumb-img" onclick="changeImage(this)">
+        <img src="https://iili.io/KWCvva4.jpg" 
+             class="thumb-img" onclick="changeImage(this)">
+        <img src="https://iili.io/KWChtIa.jpg" 
+             class="thumb-img" onclick="changeImage(this)">
+      </div>
+    </div>
+
+    <!-- Product Info -->
+    <div class="col-md-6">
+      <h2 style="font-weight:700;">Happy Birthday - code</h2>
+      <p class="text-muted">Build Using React Framework</p>
+      <p class="price-tag">₹99/-</p>
+      
+      <!-- <p>
+        For Guidence You Can Connect us on Whatsapp for any help.
+      </p> -->
+      
+      <ul>
+        <li>Life Time Acess</li>
+        <li>Installation Video</li>
+        <li>Instant Email code Delivery</li>
+      </ul>
+      
+      <button class="btn btn-buy mt-3" onclick="window.location.href='https://rzp.io/rzp/43qXocY3'">
+  Buy Now
+</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  function changeImage(el) {
+    document.getElementById("mainImage").src = el.src;
+  }
+</script>
+
+</body>
+</html>

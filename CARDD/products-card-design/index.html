@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Cards UI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Reset & Base */
+    * {margin:0;padding:0;box-sizing:border-box;}
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background:#f4f6f8;color:#333;line-height:1.6;transition:background .3s,color .3s;
+    }
+    body.dark-mode {background:#1a1a1a;color:#f5f5f5;}
+    img {max-width:100%;display:block;}
+
+    /* Header */
+    header {background:#fff;padding:1rem 2rem;box-shadow:0 2px 5px rgba(0,0,0,0.1);position:sticky;top:0;z-index:1000;transition:.3s;}
+    body.dark-mode header {background:#2c2c2c;}
+    header h1 {font-size:1.5rem;color:#007bff;}
+
+    /* Controls */
+    .controls {display:flex;flex-wrap:wrap;gap:1rem;margin:1rem 0;}
+    .controls input,.controls select {
+      padding:.5rem 1rem;border:1px solid #ccc;border-radius:5px;flex:1 1 200px;
+    }
+    .controls button {
+      padding:.5rem 1rem;border:none;border-radius:5px;background:#007bff;color:#fff;cursor:pointer;transition:.3s;
+    }
+    .controls button:hover {background:#0056b3;}
+    .view-toggle button {background:#6c757d;}
+    .view-toggle button.active {background:#007bff;}
+
+    /* Product Grid */
+    .product-container {
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      gap:1.5rem;padding:2rem;
+    }
+    .product-card {
+      background:#fff;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.1);
+      overflow:hidden;display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s;
+    }
+    body.dark-mode .product-card {background:#2c2c2c;}
+    .product-card:hover {transform:translateY(-5px);box-shadow:0 10px 15px rgba(0,0,0,0.15);}
+    .product-card img {width:100%;height:200px;object-fit:cover;}
+    .product-card-content {padding:1rem;flex:1;display:flex;flex-direction:column;}
+    .product-title {font-size:1.2rem;margin-bottom:.5rem;}
+    .product-description {font-size:.9rem;color:#555;margin-bottom:1rem;}
+    body.dark-mode .product-description {color:#bbb;}
+    .product-price {font-weight:bold;color:#28a745;margin-bottom:1rem;}
+    .rating {color:#f39c12;margin-bottom:1rem;}
+
+    /* Actions */
+    .product-actions {margin-top:auto;display:flex;gap:.5rem;}
+    .product-actions button {
+      flex:1;padding:.5rem;border:none;border-radius:5px;cursor:pointer;
+      transition:.3s;font-size:.9rem;
+    }
+    .btn-cart {background:#007bff;color:#fff;}
+    .btn-cart:hover {background:#0056b3;}
+    .btn-wishlist {background:#e0e0e0;color:#333;}
+    .btn-wishlist.active {background:#ff4757;color:#fff;}
+    .btn-wishlist:hover {background:#ccc;}
+
+    /* List View */
+    .list-view .product-container {grid-template-columns:1fr;}
+    .list-view .product-card {flex-direction:row;height:200px;}
+    .list-view .product-card img {width:200px;height:100%;}
+    .list-view .product-card-content {flex:1;}
+
+    /* Pagination */
+    .pagination {display:flex;justify-content:center;align-items:center;gap:.5rem;margin:2rem 0;}
+    .pagination button {
+      padding:.5rem 1rem;border:1px solid #ccc;background:#fff;cursor:pointer;border-radius:5px;transition:.3s;
+    }
+    .pagination button.active {background:#007bff;color:#fff;}
+    .pagination button:disabled {cursor:not-allowed;opacity:.5;}
+    body.dark-mode .pagination button {background:#2c2c2c;color:#f5f5f5;border:1px solid #555;}
+
+    /* No Results */
+    .no-results {text-align:center;padding:2rem;font-size:1.2rem;color:#777;}
+    body.dark-mode .no-results {color:#bbb;}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Product Store</h1>
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="Search products...">
+      <select id="filterCategory">
+        <option value="all">All Categories</option>
+        <option value="electronics">Electronics</option>
+        <option value="fashion">Fashion</option>
+        <option value="home">Home</option>
+      </select>
+      <select id="sortProducts">
+        <option value="default">Sort By</option>
+        <option value="priceLowHigh">Price: Low to High</option>
+        <option value="priceHighLow">Price: High to Low</option>
+        <option value="ratingHighLow">Rating: High to Low</option>
+      </select>
+      <div class="view-toggle">
+        <button id="gridView" class="active"><i class="fas fa-th"></i></button>
+        <button id="listView"><i class="fas fa-list"></i></button>
+      </div>
+      <button id="toggleDarkMode"><i class="fas fa-moon"></i></button>
+    </div>
+  </header>
+
+  <main>
+    <div class="product-container" id="products"></div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+
+  <script>
+    const products = [
+      {id:1,title:"Smartphone",description:"Latest model with advanced features",price:699,category:"electronics",rating:4.5,image:"https://via.placeholder.com/400x300?text=Smartphone"},
+      {id:2,title:"Headphones",description:"Noise-cancelling over-ear headphones",price:199,category:"electronics",rating:4.7,image:"https://via.placeholder.com/400x300?text=Headphones"},
+      {id:3,title:"Sneakers",description:"Comfortable and stylish sneakers",price:89,category:"fashion",rating:4.2,image:"https://via.placeholder.com/400x300?text=Sneakers"},
+      {id:4,title:"Wristwatch",description:"Elegant wristwatch for all occasions",price:149,category:"fashion",rating:4.8,image:"https://via.placeholder.com/400x300?text=Wristwatch"},
+      {id:5,title:"Coffee Maker",description:"Brew the perfect cup every time",price:129,category:"home",rating:4.3,image:"https://via.placeholder.com/400x300?text=Coffee+Maker"},
+      {id:6,title:"Backpack",description:"Durable backpack for everyday use",price:59,category:"fashion",rating:4.1,image:"https://via.placeholder.com/400x300?text=Backpack"},
+      {id:7,title:"Laptop",description:"High-performance laptop for work and play",price:1199,category:"electronics",rating:4.9,image:"https://via.placeholder.com/400x300?text=Laptop"},
+      {id:8,title:"Blender",description:"Make smoothies and shakes easily",price:49,category:"home",rating:4.0,image:"https://via.placeholder.com/400x300?text=Blender"},
+      {id:9,title:"Jacket",description:"Warm and stylish winter jacket",price:129,category:"fashion",rating:4.6,image:"https://via.placeholder.com/400x300?text=Jacket"},
+      {id:10,title:"Tablet",description:"Portable and powerful tablet device",price:499,category:"electronics",rating:4.4,image:"https://via.placeholder.com/400x300?text=Tablet"},
+      {id:11,title:"Sofa",description:"Comfortable 3-seater sofa",price:899,category:"home",rating:4.5,image:"https://via.placeholder.com/400x300?text=Sofa"},
+      {id:12,title:"T-shirt",description:"Casual cotton T-shirt",price:25,category:"fashion",rating:4.0,image:"https://via.placeholder.com/400x300?text=T-shirt"},
+    ];
+
+    const productsContainer = document.getElementById("products");
+    const paginationContainer = document.getElementById("pagination");
+    const searchInput = document.getElementById("searchInput");
+    const filterCategory = document.getElementById("filterCategory");
+    const sortProducts = document.getElementById("sortProducts");
+    const gridViewBtn = document.getElementById("gridView");
+    const listViewBtn = document.getElementById("listView");
+    const toggleDarkMode = document.getElementById("toggleDarkMode");
+
+    let currentPage = 1;
+    const itemsPerPage = 6;
+    let filteredProducts = [...products];
+
+    function renderProducts() {
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const paginatedProducts = filteredProducts.slice(start, end);
+
+      productsContainer.innerHTML = "";
+
+      if (paginatedProducts.length === 0) {
+        productsContainer.innerHTML = `
+          <div class="no-results">
+            <i class="fas fa-search" style="font-size:3rem;margin-bottom:1rem;"></i>
+            <p>No products found</p>
+          </div>
+        `;
+        paginationContainer.innerHTML = "";
+        return;
+      }
+
+      paginatedProducts.forEach(product => {
+        const card = document.createElement("div");
+        card.classList.add("product-card");
+        card.innerHTML = `
+          <img src="${product.image}" alt="${product.title}">
+          <div class="product-card-content">
+            <h3 class="product-title">${product.title}</h3>
+            <p class="product-description">${product.description}</p>
+            <div class="product-price">$${product.price}</div>
+            <div class="rating">${"★".repeat(Math.floor(product.rating))}${product.rating % 1 ? "½" : ""}</div>
+            <div class="product-actions">
+              <button class="btn-cart"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+              <button class="btn-wishlist"><i class="fas fa-heart"></i></button>
+            </div>
+          </div>
+        `;
+        productsContainer.appendChild(card);
+
+        // Wishlist toggle
+        const wishlistBtn = card.querySelector(".btn-wishlist");
+        wishlistBtn.addEventListener("click", () => {
+          wishlistBtn.classList.toggle("active");
+        });
+      });
+
+      renderPagination();
+    }
+
+    function renderPagination() {
+      const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+      paginationContainer.innerHTML = "";
+
+      if (totalPages <= 1) return;
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        if (i === currentPage) btn.classList.add("active");
+        btn.addEventListener("click", () => {
+          currentPage = i;
+          renderProducts();
+        });
+        paginationContainer.appendChild(btn);
+      }
+    }
+
+    function applyFilters() {
+      const searchValue = searchInput.value.toLowerCase();
+      const categoryValue = filterCategory.value;
+      const sortValue = sortProducts.value;
+
+      filteredProducts = products.filter(p =>
+        (p.title.toLowerCase().includes(searchValue) || p.description.toLowerCase().includes(searchValue)) &&
+        (categoryValue === "all" || p.category === categoryValue)
+      );
+
+      if (sortValue === "priceLowHigh") filteredProducts.sort((a,b)=>a.price-b.price);
+      else if (sortValue === "priceHighLow") filteredProducts.sort((a,b)=>b.price-a.price);
+      else if (sortValue === "ratingHighLow") filteredProducts.sort((a,b)=>b.rating-a.rating);
+
+      currentPage = 1;
+      renderProducts();
+    }
+
+    // Event Listeners
+    searchInput.addEventListener("input", applyFilters);
+    filterCategory.addEventListener("change", applyFilters);
+    sortProducts.addEventListener("change", applyFilters);
+
+    gridViewBtn.addEventListener("click",()=>{document.body.classList.remove("list-view");gridViewBtn.classList.add("active");listViewBtn.classList.remove("active");});
+    listViewBtn.addEventListener("click",()=>{document.body.classList.add("list-view");listViewBtn.classList.add("active");gridViewBtn.classList.remove("active");});
+
+    toggleDarkMode.addEventListener("click",()=>{document.body.classList.toggle("dark-mode");});
+
+    // Init
+    renderProducts();
+  </script>
+</body>
+</html>
